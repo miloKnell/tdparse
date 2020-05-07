@@ -1,6 +1,0 @@
-## This directory stores temporarily models for cross-validation
-
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore
