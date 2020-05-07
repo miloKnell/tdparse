@@ -12,7 +12,7 @@ from collections import defaultdict
 import argparse
 from argparse import ArgumentParser
 from utilities import readConll, writevec, writey, traversaltree
-from data.dataprocessing import streamtw, streamtwElec
+from data.dataprocessing import streamsentihood#streamtw#, streamtwElec
 import warnings
 
 warnings.simplefilter("error")
@@ -61,8 +61,8 @@ class lexicon(object):
         neg=set(neg)
         return pos,neg
     def Binhliu(self,filename):    
-        neg=np.loadtxt(filename[0],skiprows=1,dtype='string',comments=';')
-        pos=np.loadtxt(filename[1],skiprows=1,dtype='string',comments=';')
+        neg=np.loadtxt(filename[0],skiprows=1,dtype=str,comments=';')
+        pos=np.loadtxt(filename[1],skiprows=1,dtype=str,comments=';')
         pos=set(pos)
         neg=set(neg)
         return pos,neg
@@ -96,8 +96,10 @@ class streamdata(object):
         self.dirname = dirname
     def __iter__(self):
         for fname in os.listdir(self.dirname):
-            for line in open(os.path.join(self.dirname, fname)):
-                yield line.rstrip().split('\t')
+            #for line in open(os.path.join(self.dirname, fname),encoding='utf-8'):
+            with open(os.path.join(self.dirname, fname),encoding='utf-8') as f:
+            	for line in f:
+                	yield line.rstrip().split('\t')
 def readTang(fname='../resources/wordemb/sswe'):
     embs=streamdata(fname)
     embedmodel={}
@@ -303,12 +305,12 @@ class targettw(object):
           leftf=np.append(leftf,left, axis=0)
           rightf=np.append(rightf,right, axis=0)
           tarf=np.append(tarf,tar, axis=0)
-          fulltw=fulltw.reshape(len(fulltw)/size,size)
-          left=left.reshape(len(left)/size,size)
-          right=right.reshape(len(right)/size,size) 
-          tar=tar.reshape(len(tar)/size,size)
-          leftsenti=leftsenti.reshape(len(leftsenti)/size,size)   
-          rightsenti=rightsenti.reshape(len(rightsenti)/size,size)
+          fulltw=fulltw.reshape(len(fulltw)//size,size)
+          left=left.reshape(len(left)//size,size)
+          right=right.reshape(len(right)//size,size) 
+          tar=tar.reshape(len(tar)//size,size)
+          leftsenti=leftsenti.reshape(len(leftsenti)//size,size)   
+          rightsenti=rightsenti.reshape(len(rightsenti)//size,size)
           
           fulltw_maxs=np.append(fulltw_maxs,fulltw.max(axis=0), axis=0)
           fulltw_mins=np.append(fulltw_mins,fulltw.min(axis=0), axis=0)
@@ -339,30 +341,30 @@ class targettw(object):
           leftsenti_sum=np.append(leftsenti_sum,leftsenti.sum(axis=0), axis=0)
           rightsenti_sum=np.append(rightsenti_sum,rightsenti.sum(axis=0), axis=0)
           
-        fullf=fullf.reshape(len(fullf)/size,size)
-        leftf=leftf.reshape(len(leftf)/size,size)
-        rightf=rightf.reshape(len(rightf)/size,size)
-        tarf=tarf.reshape(len(tarf)/size,size)
-        fulltw_maxs=fulltw_maxs.reshape(len(fulltw_maxs)/size,size)
-        fulltw_mins=fulltw_mins.reshape(len(fulltw_mins)/size,size)
-        fulltw_means=fulltw_means.reshape(len(fulltw_means)/size,size)
-        fulltw_prods=fulltw_prods.reshape(len(fulltw_prods)/size,size)
-        left_maxs=left_maxs.reshape(len(left_maxs)/size,size)
-        left_mins=left_mins.reshape(len(left_mins)/size,size)
-        left_means=left_means.reshape(len(left_means)/size,size)
-        left_prods=left_prods.reshape(len(left_prods)/size,size)
-        right_maxs=right_maxs.reshape(len(right_maxs)/size,size)
-        right_mins=right_mins.reshape(len(right_mins)/size,size)
-        right_means=right_means.reshape(len(right_means)/size,size)
-        right_prods=right_prods.reshape(len(right_prods)/size,size)
-        tar_maxs=tar_maxs.reshape(len(tar_maxs)/size,size)
-        tar_mins=tar_mins.reshape(len(tar_mins)/size,size)
-        tar_means=tar_means.reshape(len(tar_means)/size,size)
-        tar_prods=tar_prods.reshape(len(tar_prods)/size,size)
-        leftsenti_max=leftsenti_max.reshape(len(leftsenti_max)/size,size)
-        rightsenti_max=rightsenti_max.reshape(len(rightsenti_max)/size,size)
-        leftsenti_sum=leftsenti_sum.reshape(len(leftsenti_sum)/size,size)
-        rightsenti_sum=rightsenti_sum.reshape(len(rightsenti_sum)/size,size)
+        fullf=fullf.reshape(len(fullf)//size,size)
+        leftf=leftf.reshape(len(leftf)//size,size)
+        rightf=rightf.reshape(len(rightf)//size,size)
+        tarf=tarf.reshape(len(tarf)//size,size)
+        fulltw_maxs=fulltw_maxs.reshape(len(fulltw_maxs)//size,size)
+        fulltw_mins=fulltw_mins.reshape(len(fulltw_mins)//size,size)
+        fulltw_means=fulltw_means.reshape(len(fulltw_means)//size,size)
+        fulltw_prods=fulltw_prods.reshape(len(fulltw_prods)//size,size)
+        left_maxs=left_maxs.reshape(len(left_maxs)//size,size)
+        left_mins=left_mins.reshape(len(left_mins)//size,size)
+        left_means=left_means.reshape(len(left_means)//size,size)
+        left_prods=left_prods.reshape(len(left_prods)//size,size)
+        right_maxs=right_maxs.reshape(len(right_maxs)//size,size)
+        right_mins=right_mins.reshape(len(right_mins)//size,size)
+        right_means=right_means.reshape(len(right_means)//size,size)
+        right_prods=right_prods.reshape(len(right_prods)//size,size)
+        tar_maxs=tar_maxs.reshape(len(tar_maxs)//size,size)
+        tar_mins=tar_mins.reshape(len(tar_mins)//size,size)
+        tar_means=tar_means.reshape(len(tar_means)//size,size)
+        tar_prods=tar_prods.reshape(len(tar_prods)//size,size)
+        leftsenti_max=leftsenti_max.reshape(len(leftsenti_max)//size,size)
+        rightsenti_max=rightsenti_max.reshape(len(rightsenti_max)//size,size)
+        leftsenti_sum=leftsenti_sum.reshape(len(leftsenti_sum)//size,size)
+        rightsenti_sum=rightsenti_sum.reshape(len(rightsenti_sum)//size,size)
         
         fulltws=np.concatenate([np.median(fulltw_maxs, axis=0),
                                 np.median(fulltw_mins, axis=0),
@@ -415,7 +417,7 @@ class targettw(object):
     def lidongfeat(self, dataf, conllpath):
         """ Main function for (Dong et al., 2014) data feature extraction.
         """
-        size1=len(self.w2v['the'])
+        size1=len(self.w2v.wv['the'])
         size2=len(self.sswe['the'])
         conll = readConll(conllpath, 'cmu')
         data = streamtw(dataf)
@@ -431,8 +433,8 @@ class targettw(object):
             try:
               loc=[i for i, j in enumerate(tw) if j == target]
             except Exception as e:
-              print "Couldn't find the tokenised target!"
-              print target, tw
+              print ("Couldn't find the tokenised target!")
+              print (target, tw)
             subtw, target_position, emp = traversaltree(conll[a],target,emp,'cmu') #returns relevant words to the target
             emp = False
             if emp:
@@ -445,9 +447,9 @@ class targettw(object):
             feature=self.concattw(feature,size1,tw,'w2v',loc,target,False,'full') 
             feature=self.concattw(feature,size2,tw,'sswe',loc,target,False,'full')
             x=np.concatenate([x,feature])
-        x=x.reshape((len(y),len(x)/len(y)))
-        print x.shape
-        print count
+        x=x.reshape((len(y),len(x)//len(y)))
+        print (x.shape)
+        print (count)
         return(x,y)   
              
     def elecfeat(self, dataf, conllpath):
@@ -493,32 +495,67 @@ class targettw(object):
             feature=self.concattw(feature,size2,tw,'sswe',[loc],target,False,'full')
             x=np.concatenate([x,feature])
         x=x.reshape((len(y),len(x)/len(y)))
-        print x.shape
-        print count
+        print (x.shape)
+        print (count)
         return(x,y,id)
 
+    def sentihoodfeats(self,dataf,conllpath):
+        size1=len(self.w2v.wv['the'])
+        size2=len(self.sswe['the'])
+        conll = readConll(conllpath, 'cmu')
+        data = streamsentihood(dataf)
+        y=[]
+        x=np.array([])
+        count=0
+        for a, d in enumerate(data):
+            feature=np.array([])
+            emp=False
+            tw = [t[1].lower() for t in conll[a]]
+            target = d[1]
+            y.append(d[2])
+            try:
+              loc=[i for i, j in enumerate(tw) if j == target]
+            except Exception as e:
+              print ("Couldn't find the tokenised target!")
+              print (target, tw)
+            subtw, target_position, emp = traversaltree(conll[a],target,emp,'cmu') #returns relevant words to the target
+            emp = False
+            if emp:
+              count+=1
+              feature=self.concattw(feature,size1,tw,'w2v',loc,target,emp,'full') 
+              feature=self.concattw(feature,size2,tw,'sswe',loc,target,emp,'full')
+            else:
+              feature=self.concattw(feature,size1,subtw,'w2v',target_position,target,False,'parse') 
+              feature=self.concattw(feature,size2,subtw,'sswe',target_position,target,False,'parse')
+            feature=self.concattw(feature,size1,tw,'w2v',loc,target,False,'full') 
+            feature=self.concattw(feature,size2,tw,'sswe',loc,target,False,'full')
+            x=np.concatenate([x,feature])
+        x=x.reshape((len(y),len(x)//len(y)))
+        print (x.shape)
+        print (count)
+        return(x,y)   
 
 def main(d, train_conllpath, test_conllpath):
     features=targettw()
-    print "extracting features for training"
+    print ("extracting features for training")
     if (d == 'lidong') or (d == 'semeval'):
         x_train,y_train=features.lidongfeat('../data/'+d+'/training/', train_conllpath)
-        print 'Parse source: ', train_conllpath
+        print ('Parse source: ', train_conllpath)
     elif d == 'election':
-        print 'election training data'
+        print ('election training data')
         x_train,y_train,id_train=features.elecfeat('../data/'+d+'/training/', train_conllpath)
         writey('../data/'+d+'/output/id_train',id_train)
-        print 'Parse source: ', train_conllpath
+        print ('Parse source: ', train_conllpath)
     writevec('../data/'+d+'/output/training',x_train,y_train)
     
-    print "extracting features for testing"
+    print ("extracting features for testing")
     if (d == 'lidong') or (d == 'semeval'):
         x_test,y_test=features.lidongfeat('../data/'+d+'/testing/', test_conllpath)
-        print 'Parse source: ', test_conllpath
+        print ('Parse source: ', test_conllpath)
     elif d == 'election':
-        print 'election testing data'
+        print ('election testing data')
         x_test,y_test,id_test=features.elecfeat('../data/'+d+'/testing/', test_conllpath)
-        print 'Parse source: ', test_conllpath
+        print ('Parse source: ', test_conllpath)
     writevec('../data/'+d+'/output/testing',x_test,y_test)
     writey('../data/'+d+'/output/y_test',y_test)
 

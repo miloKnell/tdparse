@@ -2,8 +2,8 @@ import subprocess
 from argparse import ArgumentParser
 import numpy as np
 from sklearn import metrics
-from sklearn.cross_validation import ShuffleSplit
-from sklearn.cross_validation import LabelKFold
+from sklearn.model_selection import ShuffleSplit
+from sklearn.model_selection import KFold
 from utilities import feval, frange, getlabels, writingfile, readfeats
 
 
@@ -11,7 +11,7 @@ def scaling(output_dir):
     """ Scales features to a specified range (e.g. between -1 and 1).
     Returns 'train.scale' and 'test.scale' scaled feature outputs.
     """
-    print 'Scaling features'
+    print ('Scaling features')
     cmd1=["../liblinear/svm-scale", "-l", "-1", "-u", "1", "-s", "../liblinear/range", "../data/"+output_dir+"/training"]
     with open("../data/"+output_dir+"/train.scale", "w") as outfile1:
         subprocess.call(cmd1, stdout=outfile1)
@@ -84,7 +84,7 @@ def CV(ci,trfile,CV_trfile,CV_tfile,CV_pfile,CV_truey,id_train):
     f1_three = np.mean(np.asarray(f1_three_list))
     f1_two = np.mean(np.asarray(f1_two_list))
     acc = np.mean(np.asarray(acc_list))
-    print "When C=%s, acc is %f, 2-class-f1 is %f and 3-class-f1 is %f"%(ci, acc, f1_two, f1_three)
+    print ("When C=%{}, acc is {}, 2-class-f1 is {} and 3-class-f1 is {}".format(ci, acc, f1_two, f1_three))
     return [acc, f1_three, f1_two] 
 
 
@@ -111,7 +111,7 @@ def TUNE(trfile,cv_trfile,cv_tfile,cv_pfile,cv_truey,id_train):
     tunec=sorted(tunec,key=lambda x: x[1],reverse=True)
     return tunec
 
-
+'''
 def main(output_dir, ci, steps):
     """ Main function for setting classification process and printing scores.
     """
@@ -181,3 +181,4 @@ if __name__ == "__main__":
     output_dir = args.d + '/output' #All feature outputs and results are stored in this directory
     main(output_dir, args.ci, args.p)
 
+'''

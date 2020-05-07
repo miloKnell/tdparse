@@ -1,9 +1,10 @@
 import os
 import re
 import codecs
-from ftfy import fix_text
+#from ftfy import fix_text
 from gensim import utils
-from twtokenize import tokenize
+from data.twtokenize import mytokenize
+from smart_open import open as smart_open
 
 
 class streamtw(object):
@@ -18,7 +19,7 @@ class streamtw(object):
             fname = os.path.join(self.dirname, fname)
             if not os.path.isfile(fname):
                 continue
-            for line in utils.smart_open(fname):
+            for line in smart_open(fname,encoding='utf-8'):
                 self.i+=1
                 if self.i==1:
                     tw=line.lower().strip()
@@ -33,8 +34,34 @@ class streamtw(object):
                     yield (tweet,'_'.join(target.split()),senti)
                     self.i=0
 
-#----------------------------------------------------------------------------
 
+class streamsentihood():
+    def __init__(self, dirname):
+        self.i=0
+        self.dirname = dirname
+
+    def __iter__(self):
+        '''for fname in os.listdir(self.dirname):
+            fname = os.path.join(self.dirname, fname)
+            if not os.path.isfile(fname):
+                continue'''
+        for line in smart_open(self.dirname,encoding='utf-8'):
+            self.i+=1
+            if self.i==1:
+                tw=line.lower().strip()
+            if self.i==2:
+                target=line.lower().strip()
+            if self.i==3:
+                senti=int(line.strip())+1
+                tw=tw.replace(target,' '+target+' ')
+                tw=tw.replace(''.join(target.split()),' '+'_'.join(target.split())+' ')
+                tw=tw.replace(target,' '+'_'.join(target.split())+' ')
+                tweet=mytokenize(tw)
+                yield (tweet,'_'.join(target.split()),senti)
+                self.i=0
+
+#----------------------------------------------------------------------------
+'''
 class streamtwElec(object):
     """Iterate over sentences from the election dataset"""
     def __init__(self, dirname):
@@ -82,13 +109,13 @@ class streamtwElec(object):
                     try:
                         r = range[wh]
                     except:
-                        print "Error at processing election data; at line 85 process_data.py!"
+                        print ("Error at processing election data; at line 85 process_data.py!")
                     tw=tw[:r[0]]+ tw[r[0]:r[1]+2].replace(target, ' '+target+' ') + tw[r[1]+2:]
                     tw=tw[:r[0]]+ tw[r[0]:r[1]+4].replace(''.join(target.split()),' '+'_'.join(target.split())+' ') + tw[r[1]+4:]
                     tw=tw[:r[0]]+ tw[r[0]:r[1]+6].replace(target,' '+'_'.join(target.split())+' ') + tw[r[1]+6:]              
                 tweet=tokenize(tw)
                 yield (tweet,'_'.join(target.split()),senti,id,wh)
-
+'''
 #------------------------------------------------------------------------------
 
 class streampos(object):
@@ -101,7 +128,7 @@ class streampos(object):
             fname = os.path.join(self.dirname, fname)
             if not os.path.isfile(fname):
                 continue
-            for line in utils.smart_open(fname):
+            for line in smart_open(fname):
                 tw,pos,score,tokens=line.strip().split('\t')
                 yield pos
 

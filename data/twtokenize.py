@@ -24,8 +24,9 @@ from __future__ import print_function
 
 import operator
 import re
-import HTMLParser
-
+import html.parser
+import nltk
+'''
 def regex_or(*items):
     return '(?:' + '|'.join(items) + ')'
 
@@ -298,4 +299,13 @@ def normalizeTextForTagger(text):
 def tokenizeRawTweetText(text):
     tokens = tokenize(normalizeTextForTagger(text))
     return tokens
-
+'''
+def mytokenize(text):
+    tok = nltk.tokenize.word_tokenize(text)
+    return tok
+    '''if 'location1' not in [t.lower for t in tok]:
+        for i,t in enumerate(tok):
+            if 'location1' in t.lower():
+                tok[i]='location1'
+    else:
+        return tok'''

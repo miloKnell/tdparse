@@ -76,11 +76,11 @@ def readfeats_sklearn(datapath):
     return data[0].toarray(), data[1]
 
 
-def readConll(filepath, pmode):
+'''def readConll(filepath, pmode):
     """ Reads CoNLL-formated parse file
     """
     conll=[]
-    with open(filepath, 'r') as fin:
+    with open(filepath, 'r',encoding='utf-8') as fin:
         buf = []
         for line in fin:
             line = line.strip()
@@ -89,7 +89,7 @@ def readConll(filepath, pmode):
                     conll.append(buf)
                     buf = []
                 continue
-            line = line.split()
+            line = line.split('    ')
             if pmode == 'stanford':
                 position, token, _, tag, _, _, parser, rel, _, _ = line # for stanford parses
             elif pmode == 'cmu':
@@ -97,6 +97,28 @@ def readConll(filepath, pmode):
             position = int(position)
             parser = int(parser)
             buf.append((position, token.lower(), tag, parser, rel))
+    return conll'''
+
+def readConll(filepath, pmode):
+    """ Reads CoNLL-formated parse file
+    """
+    conll=[]
+    with open(filepath, 'r',encoding='utf-8') as fin:
+        buf = []
+        for i,line in enumerate(fin):
+            line = line.strip()
+            line = line.split('    ')
+            if pmode == 'stanford':
+                position, token, _, tag, _, _, parser, rel, _, _ = line # for stanford parses
+            elif pmode == 'cmu':
+                position, token, _, tag, _, _, parser, rel = line # for cmu parses
+            position = int(position)
+            parser = int(parser)
+            if position==0 and i!=0:
+                conll.append(buf)
+                buf=[]
+            buf.append((position, token.lower(), tag, parser, rel))
+    conll.append(buf)
     return conll
 
 
@@ -111,12 +133,12 @@ def writevec(filename,x,y):
     """Writes feature matrix in LibSVM format
     """
     f=open(filename,'wb')
-    for i in xrange(len(y)):
-            f.write(str(y[i])+'\t')
+    for i in range(len(y)):
+            f.write((str(y[i])+'\t').encode())
             feature=x[i]
             for (j,k) in enumerate(feature):
-                    f.write(str(j+1)+':'+str(k)+' ')
-            f.write('\n')
+                    f.write((str(j+1)+':'+str(k)+' ').encode())
+            f.write(('\n').encode())
     f.close() 
 
 
@@ -125,7 +147,7 @@ def writey(filename, y):
     """
     f=open(filename,'wb')
     for i in y:
-            f.write(str(i)+'\n')
+            f.write((str(i)+'\n').encode())
     f.close()     
         
         
@@ -163,8 +185,8 @@ def traversaltree(conll, target, empty, pmode):
            try:
                G.add_edge(position, head, label=rel)
            except:
-               print token
-               print conll
+               print (token)
+               print (conll)
     target_positions = []
     for position, token, tag, parser, rel in conll:
       if token == target:
@@ -176,10 +198,12 @@ def traversaltree(conll, target, empty, pmode):
     # When Stanford parser is used.
     elif pmode=='stanford':
         positions = [[item for sublist in [traversal.bfs_successors(G, target_position).keys()] for item in sublist] for target_position in target_positions]
-
     words = [[conll[i-1][1] for i in position] for position in positions]
     words_tags = [[(conll[i-1][1], conll[i-1][2]) for i in position] for position in positions]
-
+    if len(words)==0:
+        print('conll',conll)
+        print('positions',positions)
+        print('target_positions',target_positions)
     if not words[0]:
       empty = True
     result = []
@@ -189,7 +213,7 @@ def traversaltree(conll, target, empty, pmode):
        for j in range(len(words_tags[i])):
          temp.update({positions[i][j]: (words_tags[i][j][0], words_tags[i][j][1])})
        temp.update({target_positions[i]: (target, conll[target_positions[i]-1][2])})
-       temp = collections.OrderedDict(sorted(temp.items())).values()
+       temp = list(collections.OrderedDict(sorted(temp.items())).values())
        result.append(temp)
        new_target_positions.append(temp.index((target, conll[target_positions[i]-1][2])))
 
